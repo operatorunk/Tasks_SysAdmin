@@ -1,0 +1,45 @@
+PAM Authentication For Apache
+https://www.shawonruet.com/2020/10/pam-authentication-for-apache-kodekloud.html
+https://www.youtube.com/watch?v=wZrtMkELXIk
+The document root /var/www/html of all web apps is on NFS share /data on storage server in Stratos Datacenter. We have a requirement where we want to password protect a directory in the Apache web server document root. We want to password protect http://<website-url>:<apache_port>/protected URL as per the following requirements (you can use any website-url for it like localhost since there are no such specific requirements as of now):
+a. We want to use basic authentication.
+b. We do not want to use htpasswd file base authentication. Instead, we want to use PAM authentication, i.e Basic Auth + PAM so that we can authenticate with a Linux user.
+c. We already have a user james with password 8FmzjvFU6S which you need to provide access to.
+d. You can access the website on LBR link. To do so click on the + button on top of your terminal, select Select port to view on Host 1, and after adding port 80 click on Display Port.
+
+ssh tony@stapp01
+ssh steve@stapp02
+ssh tony@stapp03
+
+N.B : Do these task in all app servers (stapp01, stapp02, stapp03)
+At first install pwauth
+yum --enablerepo=epel -y install mod_authnz_external pwauth 
+
+Then Edit the config
+vi /etc/httpd/conf.d/authnz_external.conf
+
+Add these lines
+<Directory /var/www/html/protected>
+AuthType Basic
+AuthName "PAM Authentication"
+AuthBasicProvider external
+AuthExternal pwauth
+require valid-user
+</Directory>
+
+Then create a protected directory
+mkdir -p /var/www/html/protected
+
+Open the index.html file and you will found protected directory message
+vi /var/www/html/protected/index.html
+
+
+Restart and check status of httpd
+systemctl restart httpd
+systemctl status httpd
+
+Finally check from curl command with mentioned username and password
+curl -u anita:BruCStnMT5 http://localhost:8080/protected/
+curl -u james:8FmzjvFU6S  http://localhost:8080/protected/
+
+You can also click the + and Select Port on Host 80 link and then enter 80 port. Then add /protected with that link. Authentication window will be opened

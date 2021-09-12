@@ -1,0 +1,30 @@
+Create a Cron Job
+The Nautilus system admins team has prepared scripts to automate several day-to-day tasks. They want them to be deployed on all app servers in Stratos DC on a set schedule. Before that they need to test similar functionality with a sample cron job. Therefore, perform the steps below:
+a. Install cronie package on all Nautilus app servers and start crond service.
+b. Add a cron */5 * * * * echo hello > /tmp/cron_text for root user.
+
+
+Login to App Servers 
+# ssh tony@172.16.238.10 Ir0nM@n
+# ssh steve@172.16.238.11 Am3ric@
+# ssh banner@172.16.238.12 BigGr33n
+N.B: You have to do this in all server stapp01,stapp02, stapp03. I have showed only for stapp03. 
+
+1. At first login as a root user : 
+# sudo su 
+2. Install cronie in the server : 
+# yum install cronie 
+3.  Start cron service:
+# systemctl start crond 
+	Check cron service status: 
+# systemctl status crond 
+4. Create a cronjob by typing : 
+# sudo crontab -e
+    Write the cron job:
+*/5 * * * * echo hello  >  /tmp/cron_text
+Restart crond service
+systemctl restart crond    
+Check cron job: 
+# crontab -l 
+5. Check cron job for root:   
+# crontab -u root -l

@@ -1,0 +1,59 @@
+Linux Firewalld Setup
+To secure our Nautilus infrastructure in Stratos Datacenter we have decided to install and configure firewalld on all app servers. We have Apache and Nginx services running on these apps. Nginx is running as a reverse proxy server for Apache. We might have more robust firewall settings in the future, but for now we have decided to go with the given requirements listed below: 
+a. Allow all incoming connections on Nginx port.
+b. Allow incoming connections from LB host only on Apache port and block for all others.
+c. All rules must be permanent.
+d. Zone should be public.
+e. If Apache or Nginx services aren't running already, please make sure to start them
+
+
+At first start from stapp01 server
+ssh tony@stapp01
+sudo su
+
+Check appache port
+cat /etc/httpd/conf/httpd.conf | grep Listen
+Check nginx port
+cat /etc/nginx/nginx.conf | grep listen
+
+Then install firewalld
+yum install -y firewalld
+
+Enable and check status
+systemctl start firewalld
+systemctl enable firewalld
+systemctl status firewalld
+
+Staus and reload firewalld
+sudo firewall-cmd --state
+sudo firewall-cmd --reload
+
+
+Now allow the nginx port that you got from finding port number before
+sudo firewall-cmd --zone=public --add-port=8092/tcp --permanent
+
+
+Allow http and https
+firewall-cmd --permanent --zone=public --add-service={http,https}
+Allow the httpd port also
+sudo firewall-cmd --permanent --zone=public --add-rich-rule='rule family="ipv4" source address="172.16.238.14" port port=6000 protocol=tcp accept'
+
+
+Then start and check nginx service status
+sudo systemctl start nginx && sudo systemctl enable nginx && sudo systemctl status nginx
+
+
+Then check apache service status
+sudo systemctl start httpd && sudo systemctl enable httpd && sudo systemctl status httpd
+
+
+Reload and restart firewalld
+sudo firewall-cmd --reload && sudo systemctl restart firewalld && sudo firewall-cmd --zone=public --list-all
+
+
+Check if working
+curl localhost
+try with httpd port
+curl localhost:8092
+
+Finally, go to stapp02 and stapp03 server and do the same.

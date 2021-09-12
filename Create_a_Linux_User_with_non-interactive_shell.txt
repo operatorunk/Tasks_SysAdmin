@@ -1,0 +1,20 @@
+Create a Linux User with non-interactive shell 
+The System admin team of xFusionCorp Industries has installed a backup agent tool on all app servers. As per the tool's requirements they need to create a user with a non-interactive shell.
+Therefore, create a user named ammar  with a non-interactive shell on the App Server 1
+
+Log inte the requested app server
+ssh tony@172.16.238.10
+ssh steve@172.16.238.11
+ssh banner@172.16.238.12
+
+sudo su
+
+After login as a root now you can create a non interactive user. In the terminal, type the below comand.
+adduser ammar -s /sbin/nologin
+login with the new user
+id ammar
+su - ammar
+
+Check user list by typing below command
+cut -d: -f1 /etc/passwd 
+cat /etc/passwd |grep ammar

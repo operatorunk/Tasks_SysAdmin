@@ -1,0 +1,49 @@
+IPtables Installation And Configuration 
+We have one of our websites up and running on our Nautilus infrastructure in Stratos DC. Our security team has raised a concern that right now Apache’s port i.e 8084 is open for all since there is no firewall installed on these hosts. So we have decided to add some security layer for these hosts and after discussions and recommendations we have come up with the following requirements:
+1. Install iptables and all its dependencies on each app host.
+2. Block incoming port 8084 on all apps for everyone except for LBR host.
+3. Make sure the rules remain, even after system reboot.
+
+
+
+1) On both the Load Balancer and the Jump server, try to curl all the App servers using the specified port.
+Both should be able to curl the App servers.
+
+curl stapp01:8084 
+curl stapp02:8084 
+curl stapp03:8084 
+
+2) On each App Server, install the iptables-services. Enable, starts, and verify status afterwards.
+sudo yum install -y iptables-services
+systemctl enable iptables
+systemctl start iptables
+systemctl status iptables
+
+3) Put in the necessary rules to allow traffic only from the LBR host from the specified port.
+Traffic coming from sources other than the LBR HOST thru the specified port should be denied. Ensure the rules will persist even after system reboots.
+
+iptables -R INPUT 5 -p tcp --destination-port 8084 -s 172.16.238.14 -j ACCEPT
+
+iptables -A INPUT -p tcp --destination-port 8084 -j DROP
+			
+service iptables save
+
+4) Verify that the rules are in place be checking the ip-tables.
+This can be done by using the three commands below. Their outputs are also shown below.
+
+rpm -qc iptables-services
+
+(output)
+	/etc/sysconfig/ip6tables
+	/etc/sysconfig/iptables
+
+sudo /sbin/iptables-save
+
+iptables -L
+
+5) Similar with STEP 2, curl the App servers again thru the specified port from botht LBR and Jump server. This time, only the LBR host should succeed.
+
+curl stapp01:8084 
+curl stapp02:8084 
+curl stapp03:8084 
+

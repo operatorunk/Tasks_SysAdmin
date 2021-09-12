@@ -1,0 +1,61 @@
+Install and Configure Web Application
+xFusionCorp Industries is planning to host two static websites on their infra in Stratos Datacenter. The development of these websites is still in -progress, but we want to get the servers ready. The storage server has a shared directory /data that is mounted on each app host under /var/www/html directory. Please perform the following steps to accomplish the task:
+a. Install httpd package and dependencies on all app hosts.
+b. Apache should serve on port 8080 within the apps.
+c. There are two website's backups /home/thor/beta and /home/thor/games on jump_host. Set them up on Apache in a way that beta should work on link http://<<lb-url>>/beta/ and games should work on link http://<<lb-url>>/games. (do not worry about load balancer configuration, as its already configured).
+d. You can access the website on LBR link; to do so click on the + button on top of your terminal, select the option Select port to view on Host 1, and after adding port 80 click on Display Port.
+
+
+
+1- Check if the files exists in the given directory (jump server)
+ll /home/thor
+
+2- Copy the files into the app servers
+scp -r /home/thor/beta tony@172.16.238.10:/tmp
+scp -r /home/thor/games tony@172.16.238.10:/tmp
+
+**If get an error while coping make sure you have openssh client installed on app server
+For app server 1 (repeat same on other servers)
+
+ssh tony@172.16.238.10
+sudo su
+yum -y install openssh-clients
+systemctl restart sshd
+
+*** After that try to copy the file from jump server again (step 2)
+
+Check if the files have been copied to app server
+ll /tmp
+
+Install apache on app server
+yum install httpd
+
+Check apache configuration file app server what port is listening
+cat /etc/httpd/conf/httpd.conf |grep Listen
+
+Modify the configuration file to mach provided port
+vi /etc/httpd/conf/httpd.conf
+Look for /listen in vim and change the port number
+
+Check if port is listening configuration change is done
+cat /etc/httpd/conf/httpd.conf |grep Listen
+
+enable and start apache
+systemctl enable httpd
+systemctl start httpd
+systemctl status httpd
+
+
+Move files from tmp to Apache location
+mv /tmp/beta /var/www/html/ 
+mv /tmp/games /var/www/html/ 
+
+Check if files are copied
+ll /var/www/html
+
+Check from Jump server
+curl http://172.16.238.10:8080/beta
+curl http://172.16.238.10:8080/games
+
+**Repeat sema process in the other 2 app servers**
+

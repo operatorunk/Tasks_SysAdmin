@@ -1,0 +1,67 @@
+Install and Configure PostgreSQL
+The Nautilus application development team has shared that they are planning to deploy one newly developed application on Nautilus infra in Stratos DC. The application uses PostgreSQL database, so as a pre-requisite we need to set up PostgreSQL database server as per requirements shared below:
+a. Install and configure PostgreSQL database on Nautilus database server.
+b. Create a database user kodekloud_tim and set its password to Rc5C9EyvbU.
+c. Create a database kodekloud_db4 and grant full permissions to user kodekloud_tim on this database.
+d. Make appropriate settings to allow all local clients (local socket connections) to connect to the kodekloud_db4 database through kodekloud_tim user using md5 method (Please do not try to encrypt password with md5sum).
+e. At the end its good to test the db connection using these new credentials from root user or server's sudo user.
+
+stdb01
+172.16.239.10
+stdb01.stratos.xfusioncorp.com
+peter
+Sp!dy
+Nautilus DB Server
+
+Login to database server
+ssh peter@172.16.238.12
+Then login as root
+sudo su
+
+Then install postgresql
+yum install postgresql-server postgresql-contrib
+postgresql-setup initdb
+systemctl enable postgresql
+systemctl start postgresql
+systemctl status postgresql
+
+Enter into postgresql database
+sudo -u postgres psql
+
+Create user, database, and grant permission
+CREATE USER kodekloud_tim  WITH PASSWORD 'Rc5C9EyvbU';
+CREATE DATABASE kodekloud_db4;
+GRANT ALL PRIVILEGES ON DATABASE "kodekloud_db4" to kodekloud_tim;
+to exit
+\q
+
+Next open  config file
+sudo vi /var/lib/pgsql/data/postgresql.conf
+Uncomment listen_address = 'localhost'
+
+Then set the config for local
+vi /var/lib/pgsql/data/pg_hba.conf
+
+Go to bottom of the config and edit
+local all all md5
+host all all 0.0.0.0/0 md5
+
+Then restart
+sudo systemctl restart postgresql
+sudo systemctl status postgresql.service
+
+
+
+Finally Check on DBserver
+psql -U kodekloud_tim -d kodekloud_db4 -h 127.0.0.1 -W
+It will ask for user password 
+(enter user password)
+to exit
+\q
+
+Check for localhost
+psql -U kodekloud_tim -d kodekloud_db4 -h localhost -W
+It will ask for user password 
+(enter user password)
+to exit
+\q

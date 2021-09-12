@@ -1,0 +1,103 @@
+Install and Configure DB Server 
+We recently migrated one of our WordPress websites from an old server to a new infrastructure in Stratos Datacenter. We have already set up LAMP, except for the database. We have also restored website code; however, we need to restore the database to make it work on the new infra. Please perform the below given steps on DB host: 
+a. Install/Configure MariaDB server.
+b. Create a database with name kodekloud_db10.
+c. There is a DB dump on jump_host under location /home/thor/db.sql. Restore this database in newly created database.
+d. Create a user kodekloud_roy and set any password you like.
+e. Grant full permissions to user kodekloud_roy on database kodekloud_db10.
+f. Update database-related details in /data/wp-config.php file on storage server, which is our NFS server having a share /data mounted on each app server on location /var/www/html. (for more details about how to update WordPress config file please visit https://wordpress.org/support/article/editing-wp-config-php/)
+g. You can access the website on LBR link; to do so click on the + button on top of your terminal, select option Select port to view on Host 1, and after adding port 80 click on Display Port.
+
+
+
+stdb01
+172.16.239.10
+stdb01.stratos.xfusioncorp.com
+peter
+Sp!dy
+Nautilus DB Server
+Db password: password1
+First login on database server  
+ssh peter@172.16.239.10
+Switch to  root user 
+sudo su -
+Install mariadb
+sudo yum install mariadb-server
+
+Start, enable mariadb service
+systemctl start mariadb.service
+systemctl enable mariadb.service
+systemctl status mariadb.service
+
+Install MYSQL secure installation and enter root password
+mysql_secure_installation
+Remove anonymous users, dissallow remote root user login, remove test database and reload privilege tables (all yes)
+Login as MySQL root user
+mysql -u root -p
+
+Create database as requested
+CREATE DATABASE kodekloud_db10;
+Create db user as requested
+CREATE USER 'kodekloud_roy'@'localhost' identified by 'kodekloud';
+Grant full permissions to the recenly created user into bd
+GRANT ALL PRIVILEGES on kodekloud_db10.* to  'kodekloud_roy' identified by 'kodekloud' WITH GRANT OPTION;
+
+GRANT ALL PRIVILEGES on kodekloud_db10.* to 'kodekloud_roy'@'%' WITH GRANT OPTION;
+
+
+
+exit
+
+Edit the configuration file
+vi /etc/my.cnf
+Include the following lines at the botton of the file
+bind-adress=172.16.239.10
+port=3306
+
+
+
+Install apache
+yum install httpd
+
+Copy files from jump server to dbserver
+scp /home/thor/db.sql peter@172.16.239.10:/tmp
+**If get an error while coping make sure you have openssh client installed on dbserver
+ssh  peter@172.16.239.10
+sudo su
+yum -y install openssh-clients
+systemctl restart sshd
+
+*** After that try to copy the file from jump server again (previous step)
+
+Copy files from jump server to dbserver
+scp /home/thor/db.sql peter@172.16.239.10:/tmp
+
+Access to the db (storage server)
+mysql -u kodekloud_roy -p  kodekloud_db10 < /tmp/db.sql
+mysql -u kodekloud_roy -p  kodekloud_db10 -h localhost
+mysql -u kodekloud_roy -p  kodekloud_db10 -h stdb01
+
+List databases in Mariadb
+show databases;
+
+
+
+Connect to storage server
+ssh natasha@172.16.238.15
+sudo su
+cat /data/wp-config.php |grep DB_NAME
+cat /data/wp-config.php |grep DB_USER
+cat /data/wp-config.php |grep DB_PASSWORD
+cat /data/wp-config.php |grep DB_HOST
+
+sed -i 's/dbname/kodekloud_db10/g' /data/wp-config.php
+sed -i 's/dbuser/kodekloud_roy/g' /data/wp-config.php
+sed -i 's/dbpass/kodekloud/g' /data/wp-config.php
+sed -i 's/dbhost/stdb01/g' /data/wp-config.php
+
+cat /data/wp-config.php |grep DB_NAME
+cat /data/wp-config.php |grep DB_USER
+cat /data/wp-config.php |grep DB_PASSWORD
+cat /data/wp-config.php |grep DB_HOST
+
+Open a new terminal with port 80 to access the database

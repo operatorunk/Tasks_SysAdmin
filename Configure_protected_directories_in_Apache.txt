@@ -1,0 +1,42 @@
+Configure protected directories in Apache
+xFusionCorp Industries has hosted several static websites on Nautilus Application Servers in Stratos DC. There are some confidential directories on document root that need to be password protected. Because they are using Apache for hosting the websites, the production support team has decided to use .htaccess with basic auth. There is a website that needs to be uploaded to /var/www/html/devops on Nautilus App Server 3. However, we need to set up the authentication before that. 
+1. Create /var/www/html/devops direcotry if doesn't exist.
+2. Add a user anita in htpasswd and set its password to YchZHRcLkL.
+3. There is a file /tmp/index.html placed on Jump Server. Copy the same to new directory you created, please make sure default document root should remain /var/www/html. Also website should work on URL http://<app-server-hostname>:<port>/devops
+
+
+
+Open New Terminal : On Jump Server
+ll /tmp/index.html
+scp /tmp/index.html tony@stapp03:/tmp
+
+ssh on a app server According to Task
+
+ssh steve@stapp03
+sudo su
+
+Add user name According To Task.
+sudo systemctl status httpd
+sudo mkdir /var/www/html/devops
+sudo htpasswd -c /etc/httpd/.htpasswd anita
+And enter new password in the prompt
+
+
+
+
+Edit htaccess file
+vi /var/www/html/dba/.htaccess
+Add Below Lines into File
+AuthType Basic
+AuthName "Password Required"
+Require valid-user
+AuthUserFile /etc/httpd/.htpasswd
+
+Move index file from /tmp to final location /var/www/html/dba
+mv /tmp/index.html /var/www/html/devops/
+
+Restart apache service
+sudo systemctl start httpd
+sudo systemctl status httpd
+Check configuration
+curl -u anita http://172.16.238.12:8080/devops

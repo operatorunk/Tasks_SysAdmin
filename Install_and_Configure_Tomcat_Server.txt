@@ -1,0 +1,52 @@
+Install and Configure Tomcat Server 
+https://www.shawonruet.com/2020/11/install-and-configure-tomcat-server.html
+
+The Nautilus application development team recently finished the beta version of one of their Java-based applications, which they are planning to deploy on one of the app servers in Stratos DC. After an internal team meeting, they have decided to use the tomcat application server. Based on the requirements mentioned below complete the task:
+a. Install tomcat server on App Server 3 using yum.
+b. Configure it to run on port 5003.
+c. There is a ROOT.war file on Jump host at location /tmp. Deploy it on this tomcat server and make sure the webpage works directly on base URL i.e without specifying any sub-directory anything like this http://URL/ROOT .
+d. You can access the website on LBR link. To do so click on the + button on top of your terminal, select option Select port to view on Host 1, and after adding port 80 click on Display Port.
+
+
+
+Login to mentioned server as a root
+ssh banner@stapp03
+sudo su
+
+Install tomcat server
+sudo yum install tomcat
+
+Chek what port is running tomcat
+cat /usr/share/tomcat/conf/server.xml | grep port
+
+Open the config file of tomcat server and replace the port by mentioned port
+vi /usr/share/tomcat/conf/server.xml
+
+<Connector port="5003" protocol="HTTP/1.1"
+
+               connectionTimeout="20000"
+
+               redirectPort="8443" />
+
+
+Open a new terminal from host and Copy war file from jump host to desired server mentioned in the question
+On Host server
+scp /tmp/ROOT.war banner@172.16.238.12:/tmp
+
+Then copy war file to tomcat server
+
+cp /tmp/ROOT.war /usr/share/tomcat/webapps
+
+Check the file has been created properly
+On app 3 server
+ls -la  /usr/share/tomcat/webapps
+
+
+Save it and restart server on app server 3
+On app 3 server
+sudo systemctl start tomcat
+sudo systemctl status tomcat
+sudo systemctl enable tomcat
+
+Check conection from app server 3
+curl -i 172.16.238.12:5003

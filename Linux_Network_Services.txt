@@ -1,0 +1,45 @@
+Linux Network Services 
+Our monitoring tool has reported an issue in Stratos Datacenter. One of our app servers has an issue, as its Apache service is not reachable on port 8084 (which is our Apache port). The service itself could be down, the firewall could be at fault, or something else could be causing the issue.
+Use tools like telnet, netstat, etc. to find and fix the issue. Also make sure Apache is reachable from the jump host without compromising any security settings.
+
+Check what is the app server failing
+curl http://172.16.238.10:8084
+curl http://172.16.238.11:8084
+curl http://172.16.238.12:8084
+
+In our case the app1 have the error
+Log into stapp1
+ssh tony@stapp01
+Login as root:
+sudo su
+
+Then check httpd
+systemctl status httpd
+
+If the status is inactive then find the error by typing
+httpd -t
+
+
+Then go to httpd.conf by typing
+vi /etc/httpd/conf/httpd.conf
+
+Uncomment ServerName
+ServerName 172.16.238.10:8084
+
+Next check which service is blocking your port by typing this command
+netstat -anp |grep LISTEN |grep ":8084"
+
+Kill the process
+kill -9 pid_number
+
+Then restart httpd
+systemctl restart httpd
+systemctl status httpd
+
+Next add rules to the iptables
+Sudo iptables -I INPUT -p tcp -m tcp –dport 8084 -j ACCEPT
+sudo iptables-save > /etc/sysconfig/iptables
+cat /etc/sysconfig/iptables
+
+Now check from Jump Server 
+curl http://172.16.238.10:8084

@@ -1,0 +1,34 @@
+Linux Banner
+During the monthly compliance meeting, it was pointed out that several servers in the Stratos DC do not have a valid banner. The security team has provided serveral approved templates which should be applied to the servers to maintain compliance. These will be displayed to the user upon a successful login.
+Update the message of the day on all application and db servers for Nautilus. Make use of the approved template located at /home/thor/nautilus_banner on jump host
+
+IN JUMP SERVER WE NEED TO APPLY THIS COMMAND TO MOVE FILE TO ANOTHER SERVER LIKE STAPP01
+scp -r /tmp/nautilus_banner tony@172.16.238.10:/home/tony/
+scp -r /tmp/nautilus_banner steve@172.16.238.11:/home/steve/
+scp -r /tmp/nautilus_banner banner@172.16.238.12:/home/banner/
+scp -r /tmp/nautilus_banner peter@172.16.239.10:/home/peter/
+
+Then login to db server and install openssh client 
+ssh peter@172.16.239.10
+
+Next exit and copy nautilus_banner to db server. Then again login to all app servers and db server one by one. Here, I have showed only for stapp01 server. 
+
+ssh tony@172.16.238.10
+sudo mv nautilus_banner /etc/motd
+
+N.B: Do this for all app server and db server.
+
+ssh steve@172.16.238.11
+sudo mv nautilus_banner /etc/motd
+ssh banner@172.16.238.12
+sudo mv nautilus_banner /etc/motd
+ssh peter@172.16.239.10
+sudo mv nautilus_banner /etc/motd
+Then login again with ssh. You can see this banner after login in every app server and db server. 
+ssh tony@172.16.238.10
+ssh steve@172.16.238.11
+ssh banner@172.16.238.12
+ssh peter@172.16.239.10
+
+If scp fails in a server use the following command to install openssh after ssh into it
+sudo yum install openssh-client

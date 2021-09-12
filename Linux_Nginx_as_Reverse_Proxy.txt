@@ -1,0 +1,44 @@
+Linux Nginx as Reverse Proxy
+Nautilus system admin's team is planning to deploy a front end application for their backup utility on Nautilus Backup Server, so that they can manage the backups of different websites from a graphical user interface. They have shared requirements to set up the same; please accomplish the tasks as per detail given below: 
+
+In jump host and copy index.html file 
+sudo scp /home/index.html clint@172.16.238.16:/tmp
+login to backup server
+ssh clint@172.16.238.16
+sudo su
+
+Then install httpd 
+
+yum install httpd
+Now ,edit the apache config file and Change port and ServerName according to question
+
+Type
+vi /etc/httpd/conf/httpd.conf
+Search for Listen and change the port to fit requested one
+Listen 6000
+
+Now save and exit
+
+Check everithing has been set properly
+cat /etc/httpd/conf/httpd.conf |grep 6000
+Install nginx by running following commands
+yum install epel-release
+yum install nginx
+copy index.html to httpd document root
+cp /tmp/index.html /var/www/html/
+ll /var/www/html/
+
+Go to nginx config by typing
+vi /etc/nginx/nginx.conf
+
+Check everything is ok
+nginx -t
+Save it and restart httpd and nginx 
+systemctl start httpd
+systemctl start nginx
+systemctl status httpd
+systemctl status nginx
+curl http://172.16.238.16:8085
+curl http://172.16.238.16:6000
+Finally move to jump_host and check
+curl http://172.16.238.16:8085

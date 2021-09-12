@@ -1,0 +1,17 @@
+Linux Postfix Troubleshooting
+
+Log into mail server
+ssh groot@172.16.238.17
+sudo su
+Check postfix service
+systemctl status postfix
+Check the failure service errors
+journalctl -xe -u postfix
+
+vi /etc/postfix/main.cf
+In the file search for "localhost"
+we can see that "inet_interfaces = localhost" we need to comment this line to solve the issue
+
+Save the file (main.cf) and restart the postfix service
+systemctl restart postfix
+systemctl status postfix

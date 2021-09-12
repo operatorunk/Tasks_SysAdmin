@@ -1,0 +1,53 @@
+Setup SSL for Nginx
+The system admins team of xFusionCorp Industries needs to deploy a new application on App Server 2 in Stratos Datacenter. They have some pre-requites to get ready that server for application deployment. Prepare the server as per requirements shared below:
+1. Install and configure nginx on App Server 2.
+2. On App Server 2 there is a self signed SSL certificate and key present at location /tmp/nautilus.crt and /tmp/nautilus.key. Move them to some appropriate location and deploy the same in Nginx.
+3. Create an index.html file with content Welcome! under Nginx document root.
+4. For final testing try to access the App Server 2 link (either hostname or IP) from jump host using curl command. For example curl -Ik https://<app-server-ip>/.
+
+Login to app server mentioned in question
+
+ssh tony@172.16.238.10 Ir0nM@n
+
+install epel-release
+yum install epel-release
+install nginx
+yum install nginx
+start nginx
+systemctl start nginx 
+nginx status 
+systemctl status nginx
+create directory for selfsigned certificate
+mkdir /etc/ssl/private/
+Change directory permission
+chmod 700 /etc/ssl/private/
+
+move certificate to folder
+mv /tmp/nautilus.crt /etc/ssl/private/ 
+mv /tmp/nautilus.key /etc/ssl/private/
+
+Use the following config:
+    vi /etc/nginx/nginx.conf
+
+    server {
+                    listen       80 default_server;
+                    listen       [::]:80 default_server;
+                    listen       443 ssl;
+                    server_name  172.16.238.10;
+                    root         /usr/share/nginx/html;
+
+                ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+                ssl_prefer_server_ciphers on;
+                ssl_ciphers ECDHE+RSAGCM:ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:!aNULL!eNull:!EXPORT:!DES:!3DES:!MD5:!DSS;
+
+            ssl_certificate /etc/ssl/private/nautilus.crt;
+		ssl_certificate_key /etc/ssl/private/nautilus.key;
+    }
+
+Then restart and check status of nginx 
+systemctl restart nginx
+systemctl status nginx
+
+Create an index.html in /usr/share/nginx/html folder with content "welcome!"
+Check server from jump host 
+curl -Ik https://172.16.238.10

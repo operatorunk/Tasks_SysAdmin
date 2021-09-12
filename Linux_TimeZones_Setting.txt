@@ -1,0 +1,23 @@
+Linux TimeZones Setting
+During the daily standup, it was pointed out that the timezone across Nautilus Application Servers in Stratos Datacenter doesn't match with that of the local datacenter's timezone, which is Indian/Kerguelen.
+Correct the mismatch.
+
+At first login to app servers
+ssh tony@172.16.238.10
+ssh steve@172.16.238.11
+ssh banner@172.16.238.12
+Display and set the current system’s time and timezone. 
+timedatectl 
+The system timezone is configured by symlinking /etc/localtime to a binary timezone identifier in the /usr/share/zoneinfo directory. So, another option to check the timezone is to show the path the symlink points to using the ls command : 
+ls -l /etc/localtime
+
+Before changing the timezone, you’ll need to find out the long name for the timezone you want to use. The timezone naming convention usually uses a “Region/City” format.
+To list all available time zones, you can either list the files in the /usr/share/zoneinfo directory or use the timedatectl command.   
+timedatectl list-timezones 
+
+Once you identify which time zone is accurate to your location, run the following command as sudo user: 
+For example, to change the system’s timezone to America/Toronto: 
+sudo timedatectl set-timezone Indian/Kerguelen  
+
+Run the timedatectl command to verify the changes: 
+timedatectl 
