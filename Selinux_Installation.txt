@@ -1,0 +1,19 @@
+Selinux Installation
+
+The xFusionCorp Industries security team recently did a security audit of their infrastructure and came up with ideas to improve the application and server security. They decided to use SElinux for an additional security layer. They are still planning how they will implement it; however, they have decided to start testing with app servers, so based on the recommendations they have the following requirements:
+Install the required packages of SElinux on App server 1 in Stratos Datacenter and disable it permanently for now; it will be enabled after making some required configuration changes on this host. Don't worry about rebooting the server as there is already a reboot scheduled for tonight's maintenance window. Also ignore the status of SElinux command line right now; the final status after reboot should be disabled.
+
+a) Conect to backup server app01
+ssh tony@172.16.238.10
+sudo su
+
+b)Install the required packages
+sudo yum install selinux* -y
+
+c) They have also asked to permanently disable it. So you need to change the SE config file at /etc/selinux/config. In the file change the SELINUX=disabled.
+cat /etc/selinux/config
+vi /etc/selinux/config
+
+d)Check the status of selinux (It should be disabled as said on the task description)
+sestatus
+# getenforce

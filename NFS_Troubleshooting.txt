@@ -1,0 +1,50 @@
+NFS Troubleshooting
+The Nautilus production support team was trying to fix issues with their storage server. The storage server has a shared directory /appdata, which is mounted on all app servers at location /var/www/html so that whatever data they store on storage server under /appdata can be shared among all app servers. Somehow NFS server is broken and having some issues.
+Identify the root cause of the issue and fix it to make sure sharing works fine among all app servers and storage server.
+
+Login to storage server
+ # ssh natasha@172.16.238.15
+
+Enable nfs-server and rpcbind. Then check 
+# sudo systemctl enable nfs-server
+# sudo chkconfig nfs-server on
+# sudo systemctl enable rpcbind
+# sudo chkconfig rpcbind on
+
+Start nfs server and rpcbind and check status 
+# sudo systemctl start nfs-server
+# sudo systemctl status nfs-server
+
+# sudo systemctl start rpcbind
+# sudo systemctl status rpcbind
+
+Now edit exports file 
+
+# sudo vi /etc/exports
+
+Press i button and write 
+
+/appdata 172.16.238.10(rw,sync,no_root_squash)
+/appdata 172.16.238.11(rw,sync,no_root_squash)
+/appdata 172.16.238.12(rw,sync,no_root_squash) 
+
+Press ESC button and then type :wq! 
+
+Now type this command
+# sudo exportfs -a
+
+Then run show mount command to check the listed servers 
+# sudo showmount -e ststor01
+
+Open 3 new terminals for 3 appservers and do the followings in every app server 
+
+Repeat enable, check config and start, status commands for nfs-server and rpcbind like you did in storage server 
+
+Next, mount and check nfs 
+# sudo mount -t nfs ststor01:/appdata /var/www/html
+# dh -f
+
+mount | grep nfs
+
+Do this in all app servers and make sure that you have found nfs on mount with rw, realtime finally. 
+

@@ -1,0 +1,11 @@
+Disable Root Login
+After doing some security audits of servers, xFusionCorp Industries security team has implemented some new security policies. One of them is to disable direct root login through SSH.
+Disable direct SSH root login on all app servers in Stratos Datacenter.
+
+a) edit the configuration file
+you have to uncomment the line by removing # from begining PermitRootLogin no
+and update the section PermitRootLogin no save the file restart the sshd service
+vi /etc/ssh/sshd_config
+
+systemctl restart sshd
+systemctl status sshd
