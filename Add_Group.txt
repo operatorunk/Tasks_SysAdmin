@@ -1,0 +1,32 @@
+Add group
+
+There are specific access levels for users defined by the xFusionCorp Industries system admin team. Rather than providing access levels to every individual user, the team has decided to create groups with required access levels and add users to that groups as needed. See the following requirements:
+
+a) Create a group named nautilus_sftp_users in all App servers in Stratos Datacenter.
+
+Creating a usergroup (Repeat on every app server) 
+
+sudo groupadd  nautilus_sftp_users
+
+Check if group exixts (Repeat on every app server) 
+
+cut -d: -f1 /etc/group | sort
+
+
+
+b) Add the user sonya to nautilus_sftp_users in all App servers. (create the user if not present already)
+
+Create the user sonya (Repeat on every app server) 
+
+sudo adduser sonya
+
+c)Add the user sonya to the nautilus_sftp_users group (Repeat on every app server) 
+
+sudo usermod -a -G nautilus_sftp_users sonya
+
+d)Check all users in the group (Repeat on every app server) 
+
+grep 'nautilus_sftp_users' /etc/group 
+
+(alternative if we need to update the user password)
+passwd username
