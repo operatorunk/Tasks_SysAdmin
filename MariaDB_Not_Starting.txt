@@ -1,14 +1,16 @@
-# 1) Mariadb not starting question 
-## Fix not starting MariaDB
+1) Mariadb not starting question 
+Fix not starting MariaDB
 
-### a)log into DB server
+a)log into DB server
 
 ssh peter@172.16.239.10 
 sudo su
 
 
-### b)clear all in /var/lib/mysql
-### c)After that try again to run command
+b)clear all in /var/lib/mysql
+
+c)After that try again to run command
+
 mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
 sudo systemctl start mariadb
 sudo systemctl status mariadb 
