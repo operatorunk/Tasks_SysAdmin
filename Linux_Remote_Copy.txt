@@ -1,0 +1,19 @@
+Linux Remote Copy 
+One of the Nautilus developers has copied confidential data on the jump host in Stratos DC. That data must be copied to one of the app servers. Because developers do not have access to app servers, they asked the system admins team to accomplish the task for them.
+Copy /tmp/nautilus.txt.gpg file from jump server to App Server 1 at location /home/app.
+
+
+a) Copy the file from jump host to app1 node In Jump host
+# cd /tmp
+# scp nautilus.txt.gdg tony@172.16.238.10:/tmp
+b)Login to the app3 node
+# cd /tmp
+# cp nautilus.txt.gdg /home/app
+
+
+NOTE
+====
+
+IF SCP IS NOT INSTALLING FOLLOW BELOW COMMAND
+
+sudo yum install -y openssh-clients openssh

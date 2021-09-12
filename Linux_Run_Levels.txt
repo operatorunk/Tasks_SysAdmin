@@ -1,0 +1,19 @@
+Linux Run Levels
+New tools have been installed on the app server in Stratos Datacenter. Some of these tools can only be managed from the graphical user interface. Therefore, there are requirements for these app servers.
+On all App servers in Stratos Datacenter change the default runlevel so that they can boot in GUI (graphical user interface) by default.
+
+You have to do this for all app servers. I have showed here only for app01 
+
+a)Access the application servers (app01)
+ssh tony@172.16.238.10
+
+b) We have to check default 
+sudo systemctl get-default
+
+c) Next, set default, start it , enable it, check status and get default 
+sudo systemctl set-default graphical.target
+sudo systemctl start graphical.target
+sudo systemctl enable graphical.target
+sudo systemctl status graphical.target
+d) Check default again
+sudo systemctl get-default
